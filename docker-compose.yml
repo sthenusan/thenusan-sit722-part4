@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  fastapi-app:
+    image: part3.azurecr.io/book-apis:latest 
+    container_name: fastapi-app
+    environment:
+      - PORT=8000
+      - DATABASE_URL=postgresql://sit722_part3_m72t_user:p1BTozMBRIrpsdW7BBn8vYNVtlmTbkSD@dpg-creo25bgbbvc73bsh2v0-a.oregon-postgres.render.com/sit722_part3_m72t
+    ports:
+      - "8000:8000"
+    depends_on:
+      - inventory-service
+
+  inventory-service:
+    image: part3.azurecr.io/inventory:latest
+    container_name: inventory-service
+    environment:
+      - PORT=8001
+      - DATABASE_URL=postgresql://sit722_part3_m72t_user:p1BTozMBRIrpsdW7BBn8vYNVtlmTbkSD@dpg-creo25bgbbvc73bsh2v0-a.oregon-postgres.render.com/sit722_part3_m72t
+    ports:
+      - "8001:8001"
+
+networks:
+  default:
+    driver: bridge

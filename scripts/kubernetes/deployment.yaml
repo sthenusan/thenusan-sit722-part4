@@ -1,0 +1,84 @@
+# bookapi App Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookapi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bookapi-app
+  template:
+    metadata:
+      labels:
+        app: bookapi-app
+    spec:
+      containers:
+        - name: bookapi-app
+          image: part3.azurecr.io/book-apis:latest
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8000"
+            - name: DATABASE_URL
+              value: "postgresql://sit722_part3_m72t_user:p1BTozMBRIrpsdW7BBn8vYNVtlmTbkSD@dpg-creo25bgbbvc73bsh2v0-a.oregon-postgres.render.com/sit722_part3_m72t"
+          ports:
+            - containerPort: 8000
+
+---
+# bookapi Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: bookapi-service
+spec:
+  selector:
+    app: bookapi-app
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+
+---
+# Inventory Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inventory-service
+  template:
+    metadata:
+      labels:
+        app: inventory-service
+    spec:
+      containers:
+        - name: inventory-service
+          image: part3.azurecr.io/inventory:latest
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8001"
+            - name: DATABASE_URL
+              value: "postgresql://sit722_part3_m72t_user:p1BTozMBRIrpsdW7BBn8vYNVtlmTbkSD@dpg-creo25bgbbvc73bsh2v0-a.oregon-postgres.render.com/sit722_part3_m72t"
+          ports:
+            - containerPort: 8001
+
+---
+# Inventory Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+spec:
+  selector:
+    app: inventory-service
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 81
+      targetPort: 8001
